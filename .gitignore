@@ -1,0 +1,52 @@
+# Build outputs
+/build
+**/build/
+**/*.apk
+**/*.aab
+**/*.ap_
+**/*.dex
+
+# Gradle
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Android Studio / IntelliJ IDEA
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+*.iml
+
+# Kotlin build artifacts
+.kotlin/
+
+# Local config (contains SDK path — machine-specific)
+local.properties
+
+# ProGuard / R8
+**/mapping.txt
+**/seeds.txt
+**/usage.txt
+
+# NDK / CMake
+.externalNativeBuild/
+.cxx/
+
+# Signing artifacts (never commit keystore or signing configs)
+*.jks
+*.keystore
+keystore.properties
+
+# Profiling
+/captures
+
+# macOS
+.DS_Store
