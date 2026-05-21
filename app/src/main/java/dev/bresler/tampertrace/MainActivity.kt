@@ -277,19 +277,6 @@ fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, fri
       )
     }
 
-    Spacer(Modifier.height(20.dp))
-
-    Surface(shape = RoundedCornerShape(4.dp), color = Color(0xFF00E676)) {
-      Text(
-        text = "ALL CLEAR",
-        color = Color(0xFF001A0D),
-        fontSize = 10.sp,
-        fontWeight = FontWeight.ExtraBold,
-        letterSpacing = 2.5.sp,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-      )
-    }
-
     Spacer(Modifier.height(12.dp))
 
     Text(
