@@ -63,14 +63,20 @@ class MainActivity : ComponentActivity() {
         val viewModel: MainViewModel = viewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val fridaPortDetected by viewModel.fridaPortDetected.collectAsStateWithLifecycle()
-        SecurityStatusScreen(uiState = uiState, fridaPortDetected = fridaPortDetected, onExit = { finish() })
+        val fridaMemoryDetected by viewModel.fridaMemoryDetected.collectAsStateWithLifecycle()
+        SecurityStatusScreen(
+          uiState = uiState,
+          fridaPortDetected = fridaPortDetected,
+          fridaMemoryDetected = fridaMemoryDetected,
+          onExit = { finish() },
+        )
       }
     }
   }
 }
 
 @Composable
-fun SecurityStatusScreen(uiState: MainUiState, fridaPortDetected: Boolean?, onExit: () -> Unit) {
+fun SecurityStatusScreen(uiState: MainUiState, fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, onExit: () -> Unit) {
   val bgColors = when (uiState) {
     MainUiState.Rooted -> listOf(Color(0xFF0D0005), Color(0xFF2A0010), Color(0xFF0D0005))
     MainUiState.Secure -> listOf(Color(0xFF00100A), Color(0xFF002A18), Color(0xFF00100A))
@@ -83,8 +89,8 @@ fun SecurityStatusScreen(uiState: MainUiState, fridaPortDetected: Boolean?, onEx
   ) {
     when (uiState) {
       MainUiState.Loading -> LoadingScreen()
-      MainUiState.Rooted -> RootAlertScreen(fridaPortDetected = fridaPortDetected, onExit = onExit)
-      MainUiState.Secure -> SecureScreen(fridaPortDetected = fridaPortDetected)
+      MainUiState.Rooted -> RootAlertScreen(fridaPortDetected = fridaPortDetected, fridaMemoryDetected = fridaMemoryDetected, onExit = onExit)
+      MainUiState.Secure -> SecureScreen(fridaPortDetected = fridaPortDetected, fridaMemoryDetected = fridaMemoryDetected)
     }
   }
 }
@@ -101,7 +107,7 @@ fun LoadingScreen() {
 }
 
 @Composable
-fun RootAlertScreen(fridaPortDetected: Boolean?, onExit: () -> Unit) {
+fun RootAlertScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, onExit: () -> Unit) {
   val transition = rememberInfiniteTransition(label = "pulse")
 
   val ring1Scale by transition.animateFloat(
@@ -215,6 +221,11 @@ fun RootAlertScreen(fridaPortDetected: Boolean?, onExit: () -> Unit) {
           value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
           danger = fridaPortDetected == true,
         )
+        StatusRow(
+          label = "Memory Maps",
+          value = when (fridaMemoryDetected) { null -> "Checking…"; true -> "Artifacts Found"; false -> "Clean" },
+          danger = fridaMemoryDetected == true,
+        )
       }
     }
 
@@ -232,7 +243,7 @@ fun RootAlertScreen(fridaPortDetected: Boolean?, onExit: () -> Unit) {
 }
 
 @Composable
-fun SecureScreen(fridaPortDetected: Boolean?) {
+fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?) {
   val scale = remember { Animatable(0f) }
   LaunchedEffect(Unit) {
     scale.animateTo(
@@ -308,6 +319,11 @@ fun SecureScreen(fridaPortDetected: Boolean?) {
           label = "Frida Port",
           value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
           danger = fridaPortDetected == true,
+        )
+        StatusRow(
+          label = "Memory Maps",
+          value = when (fridaMemoryDetected) { null -> "Checking…"; true -> "Artifacts Found"; false -> "Clean" },
+          danger = fridaMemoryDetected == true,
         )
       }
     }
