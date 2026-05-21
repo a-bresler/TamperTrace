@@ -35,10 +35,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
   private val _fridaMemoryDetected = MutableStateFlow<Boolean?>(null)
   val fridaMemoryDetected: StateFlow<Boolean?> = _fridaMemoryDetected.asStateFlow()
 
+  private val _fridaThreadDetected = MutableStateFlow<Boolean?>(null)
+  val fridaThreadDetected: StateFlow<Boolean?> = _fridaThreadDetected.asStateFlow()
+
   init {
     onIntent(MainIntent.CheckRootStatus)
     checkFridaPort()
     checkMemoryMaps()
+    checkFridaThreads()
   }
 
   fun onIntent(intent: MainIntent) {
@@ -82,6 +86,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
       }
       _fridaMemoryDetected.value = detected
+    }
+  }
+
+  private fun checkFridaThreads() {
+    viewModelScope.launch {
+      val detected = withContext(Dispatchers.IO) {
+        try {
+          val fridaThreadNames = setOf("gmain", "gdbus", "gum-js-loop", "pool-frida")
+          File("/proc/self/task").listFiles()?.any { taskDir ->
+            val comm = File(taskDir, "comm").readText().trim()
+            fridaThreadNames.any { name -> comm.contains(name) }
+          } ?: false
+        } catch (e: Exception) {
+          false
+        }
+      }
+      _fridaThreadDetected.value = detected
     }
   }
 
