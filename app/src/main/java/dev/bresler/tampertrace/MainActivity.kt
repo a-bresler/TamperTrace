@@ -62,14 +62,15 @@ class MainActivity : ComponentActivity() {
       TamperTraceTheme {
         val viewModel: MainViewModel = viewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        SecurityStatusScreen(uiState = uiState, onExit = { finish() })
+        val fridaPortDetected by viewModel.fridaPortDetected.collectAsStateWithLifecycle()
+        SecurityStatusScreen(uiState = uiState, fridaPortDetected = fridaPortDetected, onExit = { finish() })
       }
     }
   }
 }
 
 @Composable
-fun SecurityStatusScreen(uiState: MainUiState, onExit: () -> Unit) {
+fun SecurityStatusScreen(uiState: MainUiState, fridaPortDetected: Boolean?, onExit: () -> Unit) {
   val bgColors = when (uiState) {
     MainUiState.Rooted -> listOf(Color(0xFF0D0005), Color(0xFF2A0010), Color(0xFF0D0005))
     MainUiState.Secure -> listOf(Color(0xFF00100A), Color(0xFF002A18), Color(0xFF00100A))
@@ -82,8 +83,8 @@ fun SecurityStatusScreen(uiState: MainUiState, onExit: () -> Unit) {
   ) {
     when (uiState) {
       MainUiState.Loading -> LoadingScreen()
-      MainUiState.Rooted -> RootAlertScreen(onExit = onExit)
-      MainUiState.Secure -> SecureScreen()
+      MainUiState.Rooted -> RootAlertScreen(fridaPortDetected = fridaPortDetected, onExit = onExit)
+      MainUiState.Secure -> SecureScreen(fridaPortDetected = fridaPortDetected)
     }
   }
 }
@@ -100,7 +101,7 @@ fun LoadingScreen() {
 }
 
 @Composable
-fun RootAlertScreen(onExit: () -> Unit) {
+fun RootAlertScreen(fridaPortDetected: Boolean?, onExit: () -> Unit) {
   val transition = rememberInfiniteTransition(label = "pulse")
 
   val ring1Scale by transition.animateFloat(
@@ -209,6 +210,11 @@ fun RootAlertScreen(onExit: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
         StatusRow("Root Access", "Confirmed", danger = true)
+        StatusRow(
+          label = "Frida Port",
+          value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
+          danger = fridaPortDetected == true,
+        )
       }
     }
 
@@ -226,7 +232,7 @@ fun RootAlertScreen(onExit: () -> Unit) {
 }
 
 @Composable
-fun SecureScreen() {
+fun SecureScreen(fridaPortDetected: Boolean?) {
   val scale = remember { Animatable(0f) }
   LaunchedEffect(Unit) {
     scale.animateTo(
@@ -298,6 +304,11 @@ fun SecureScreen() {
         verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
         StatusRow("Root Access", "Not Detected", danger = false)
+        StatusRow(
+          label = "Frida Port",
+          value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
+          danger = fridaPortDetected == true,
+        )
       }
     }
   }
