@@ -15,6 +15,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -142,101 +145,97 @@ fun RootAlertScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, 
   Column(
     modifier = Modifier.fillMaxSize().padding(horizontal = 28.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
   ) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(160.dp)) {
-      Box(
-        modifier =
-          Modifier.size(140.dp)
-            .scale(ring1Scale)
-            .alpha(ring1Alpha)
-            .background(Color(0x44FF1744), CircleShape)
-      )
-      Box(
-        modifier =
-          Modifier.size(140.dp)
-            .scale(ring2Scale)
-            .alpha(ring2Alpha)
-            .background(Color(0x44FF1744), CircleShape)
-      )
-      Box(
-        modifier = Modifier.size(96.dp).background(Color(0x33FF1744), CircleShape),
-        contentAlignment = Alignment.Center,
-      ) {
-        Icon(
-          imageVector = Icons.Filled.Warning,
-          contentDescription = null,
-          tint = Color(0xFFFF1744),
-          modifier = Modifier.size(48.dp),
-        )
-      }
-    }
-
-    Spacer(Modifier.height(28.dp))
-
-    Surface(shape = RoundedCornerShape(4.dp), color = Color(0xFFFF1744)) {
-      Text(
-        text = "SECURITY THREAT",
-        color = Color.White,
-        fontSize = 10.sp,
-        fontWeight = FontWeight.ExtraBold,
-        letterSpacing = 2.5.sp,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
-      )
-    }
-
-    Spacer(Modifier.height(14.dp))
-
-    Text(
-      text = "Root\nDetected",
-      color = Color.White,
-      fontSize = 44.sp,
-      fontWeight = FontWeight.Black,
-      textAlign = TextAlign.Center,
-      lineHeight = 50.sp,
-    )
-
-    Spacer(Modifier.height(14.dp))
-
-    Text(
-      text = "This device has been rooted or modified.\nTamperTrace cannot operate on a\ncompromised environment.",
-      color = Color(0x99FFFFFF),
-      fontSize = 14.sp,
-      textAlign = TextAlign.Center,
-      lineHeight = 21.sp,
-    )
-
-    Spacer(Modifier.height(36.dp))
-
-    Surface(
-      shape = RoundedCornerShape(14.dp),
-      color = Color(0x1AFF1744),
-      modifier = Modifier.fillMaxWidth(),
+    Column(
+      modifier = Modifier.weight(1f),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
     ) {
-      Column(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-      ) {
-        StatusRow("Root Access", "Confirmed", danger = true)
-        StatusRow(
-          label = "Frida Port",
-          value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
-          danger = fridaPortDetected == true,
+      Box(contentAlignment = Alignment.Center, modifier = Modifier.size(112.dp)) {
+        Box(
+          modifier =
+            Modifier.size(96.dp)
+              .scale(ring1Scale)
+              .alpha(ring1Alpha)
+              .background(Color(0x44FF1744), CircleShape)
         )
-        StatusRow(
-          label = "Memory Maps",
-          value = when (fridaMemoryDetected) { null -> "Checking…"; true -> "Artifacts Found"; false -> "Clean" },
-          danger = fridaMemoryDetected == true,
+        Box(
+          modifier =
+            Modifier.size(96.dp)
+              .scale(ring2Scale)
+              .alpha(ring2Alpha)
+              .background(Color(0x44FF1744), CircleShape)
         )
-        StatusRow(
-          label = "Frida Threads",
-          value = when (fridaThreadDetected) { null -> "Checking…"; true -> "Found"; false -> "None" },
-          danger = fridaThreadDetected == true,
-        )
+        Box(
+          modifier = Modifier.size(68.dp).background(Color(0x33FF1744), CircleShape),
+          contentAlignment = Alignment.Center,
+        ) {
+          Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = Color(0xFFFF1744),
+            modifier = Modifier.size(36.dp),
+          )
+        }
       }
+
+      Spacer(Modifier.height(16.dp))
+
+      Text(
+        text = "Root\nDetected",
+        color = Color.White,
+        fontSize = 36.sp,
+        fontWeight = FontWeight.Black,
+        textAlign = TextAlign.Center,
+        lineHeight = 50.sp,
+      )
+
+      Spacer(Modifier.height(12.dp))
+
+      Text(
+        text = "This device has been rooted or modified.\nTamperTrace cannot operate on a\ncompromised environment.",
+        color = Color(0x99FFFFFF),
+        fontSize = 14.sp,
+        textAlign = TextAlign.Center,
+        lineHeight = 21.sp,
+      )
+
+      Spacer(Modifier.height(24.dp))
+
+      Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = Color(0x1AFF1744),
+        modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp),
+      ) {
+        Column(
+          modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 18.dp),
+          verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+          StatusRow("Root Access", "Confirmed", danger = true)
+          StatusRow(
+            label = "Frida Port",
+            value = when (fridaPortDetected) { null -> "Checking…"; true -> "Active"; false -> "Not Detected" },
+            danger = fridaPortDetected == true,
+          )
+          StatusRow(
+            label = "Memory Maps",
+            value = when (fridaMemoryDetected) { null -> "Checking…"; true -> "Artifacts Found"; false -> "Clean" },
+            danger = fridaMemoryDetected == true,
+          )
+          StatusRow(
+            label = "Frida Threads",
+            value = when (fridaThreadDetected) { null -> "Checking…"; true -> "Found"; false -> "None" },
+            danger = fridaThreadDetected == true,
+          )
+        }
+      }
+
+      Spacer(Modifier.height(24.dp))
     }
 
-    Spacer(Modifier.height(32.dp))
+    Spacer(Modifier.height(8.dp))
 
     Button(
       onClick = onExit,
@@ -246,6 +245,8 @@ fun RootAlertScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, 
     ) {
       Text(text = "Exit Application", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
     }
+
+    Spacer(Modifier.height(52.dp))
   }
 }
 
@@ -265,18 +266,18 @@ fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, fri
     verticalArrangement = Arrangement.Center,
   ) {
     Box(
-      modifier = Modifier.size(120.dp).scale(scale.value).background(Color(0x2200E676), CircleShape),
+      modifier = Modifier.size(88.dp).scale(scale.value).background(Color(0x2200E676), CircleShape),
       contentAlignment = Alignment.Center,
     ) {
       Icon(
         imageVector = Icons.Filled.Lock,
         contentDescription = null,
         tint = Color(0xFF00E676),
-        modifier = Modifier.size(52.dp),
+        modifier = Modifier.size(38.dp),
       )
     }
 
-    Spacer(Modifier.height(28.dp))
+    Spacer(Modifier.height(20.dp))
 
     Surface(shape = RoundedCornerShape(4.dp), color = Color(0xFF00E676)) {
       Text(
@@ -289,7 +290,7 @@ fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, fri
       )
     }
 
-    Spacer(Modifier.height(14.dp))
+    Spacer(Modifier.height(12.dp))
 
     Text(
       text = "Device\nSecure",
@@ -300,7 +301,7 @@ fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, fri
       lineHeight = 50.sp,
     )
 
-    Spacer(Modifier.height(14.dp))
+    Spacer(Modifier.height(12.dp))
 
     Text(
       text = "No root access detected. Your device\npassed all integrity checks and is running\nin a trusted environment.",
@@ -310,15 +311,17 @@ fun SecureScreen(fridaPortDetected: Boolean?, fridaMemoryDetected: Boolean?, fri
       lineHeight = 21.sp,
     )
 
-    Spacer(Modifier.height(36.dp))
+    Spacer(Modifier.height(24.dp))
 
     Surface(
-      shape = RoundedCornerShape(14.dp),
+      shape = RoundedCornerShape(12.dp),
       color = Color(0x1A00E676),
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().heightIn(max = 240.dp),
     ) {
       Column(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+        modifier = Modifier
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 20.dp, vertical = 18.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
         StatusRow("Root Access", "Not Detected", danger = false)
